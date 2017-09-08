@@ -1,5 +1,4 @@
 const Sugar = require('sugar');
-const request = require('request');
 const slack = require('../slack');
 
 // matches a deadline (either a single word, or quoted string) and a message. e.g.:
@@ -20,6 +19,17 @@ module.exports = (hook) => {
   const deadline = Sugar.Date.create(command[1].replace(/^"|"$/g, ''));
   if(!deadline) {
     return error("Sorry, I couldn't parse your deadline - I use Sugar (https://sugarjs.com) to parse dates");
+  }
+
+  if((new Date(deadline)).getTime() < Date.now()) {
+    const timeTravellers = [
+      '"Doc" Brown',
+      'Doctor Who',
+      'Bill and/or Ted',
+    ];
+
+    const you = timeTravellers[Math.floor(Math.random() * timeTravellers.length)];
+    return error(`This deadline would be in the past! Who do you think you are, ${you}?`);
   }
   
   hook.datastore.get('commitments', (err, _commitments) => {

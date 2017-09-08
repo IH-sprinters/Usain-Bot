@@ -61,7 +61,7 @@ module.exports =
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -72,15 +72,9 @@ module.exports = require("sugar");
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports) {
-
-module.exports = require("request");
-
-/***/ }),
-/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const request = __webpack_require__(1);
+const request = __webpack_require__(4);
 
 module.exports = (hook) => {
   const {res, env, params} = hook;
@@ -115,10 +109,10 @@ module.exports = (hook) => {
 
 
 /***/ }),
-/* 3 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const commit = __webpack_require__(4);
+const commit = __webpack_require__(3);
 const commitments = __webpack_require__(5);
 
 module.exports = (hook) => {
@@ -141,12 +135,11 @@ module.exports = (hook) => {
 
 
 /***/ }),
-/* 4 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const Sugar = __webpack_require__(0);
-const request = __webpack_require__(1);
-const slack = __webpack_require__(2);
+const slack = __webpack_require__(1);
 
 // matches a deadline (either a single word, or quoted string) and a message. e.g.:
 // today complete some task
@@ -166,6 +159,17 @@ module.exports = (hook) => {
   const deadline = Sugar.Date.create(command[1].replace(/^"|"$/g, ''));
   if(!deadline) {
     return error("Sorry, I couldn't parse your deadline - I use Sugar (https://sugarjs.com) to parse dates");
+  }
+
+  if((new Date(deadline)).getTime() < Date.now()) {
+    const timeTravellers = [
+      '"Doc" Brown',
+      'Doctor Who',
+      'Bill and/or Ted',
+    ];
+
+    const you = timeTravellers[Math.floor(Math.random() * timeTravellers.length)];
+    return error(`This deadline would be in the past! Who do you think you are, ${you}?`);
   }
   
   hook.datastore.get('commitments', (err, _commitments) => {
@@ -211,11 +215,17 @@ module.exports = (hook) => {
 };
 
 /***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+module.exports = require("request");
+
+/***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const Sugar = __webpack_require__(0);
-const slack = __webpack_require__(2);
+const slack = __webpack_require__(1);
 
 module.exports = (hook) => {
   const {respond, post, reply, error} = slack(hook);
