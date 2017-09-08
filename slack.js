@@ -1,3 +1,5 @@
+const request = require('request');
+
 module.exports = (hook) => {
   const {res, env, params} = hook;
 

@@ -61,7 +61,7 @@ module.exports =
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -73,6 +73,14 @@ module.exports = require("sugar");
 /***/ }),
 /* 1 */
 /***/ (function(module, exports) {
+
+module.exports = require("request");
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const request = __webpack_require__(1);
 
 module.exports = (hook) => {
   const {res, env, params} = hook;
@@ -107,10 +115,10 @@ module.exports = (hook) => {
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const commit = __webpack_require__(3);
+const commit = __webpack_require__(4);
 const commitments = __webpack_require__(5);
 
 module.exports = (hook) => {
@@ -133,12 +141,12 @@ module.exports = (hook) => {
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const Sugar = __webpack_require__(0);
-const request = __webpack_require__(4);
-const slack = __webpack_require__(1);
+const request = __webpack_require__(1);
+const slack = __webpack_require__(2);
 
 // matches a deadline (either a single word, or quoted string) and a message. e.g.:
 // today complete some task
@@ -203,17 +211,11 @@ module.exports = (hook) => {
 };
 
 /***/ }),
-/* 4 */
-/***/ (function(module, exports) {
-
-module.exports = require("request");
-
-/***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const Sugar = __webpack_require__(0);
-const slack = __webpack_require__(1);
+const slack = __webpack_require__(2);
 
 module.exports = (hook) => {
   const {respond, post, reply, error} = slack(hook);
