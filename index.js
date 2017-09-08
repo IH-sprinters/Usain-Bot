@@ -1,4 +1,3 @@
-const { authenticate } = require('./functions');
 const commit = require('./commands/commit');
 const commitments = require('./commands/commitments');
 
