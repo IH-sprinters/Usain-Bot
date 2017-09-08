@@ -2,7 +2,7 @@
   "name": "usain",
   "version": "1.0.0",
   "description": "the best sprinter there is!",
-  "main": "index.js",
+  "main": "dist.js",
   "scripts": {
     "build": "./node_modules/.bin/webpack"
   },

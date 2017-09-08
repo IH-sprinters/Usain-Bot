@@ -1,6 +1,6 @@
 const Sugar = require('sugar');
 const request = require('request');
-const slack = require(__dirname + '/../slack');
+const slack = require('../slack');
 
 // matches a deadline (either a single word, or quoted string) and a message. e.g.:
 // today complete some task
