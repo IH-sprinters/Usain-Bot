@@ -1,0 +1,10 @@
+{
+  "name": "usain",
+  "version": "1.0",
+  "description": "the best sprinter there is!",
+  "main": "index.js",
+  "dependencies": {
+    "request": "^2.81.0",
+    "sugar": "^2.0.4"
+  }
+}
