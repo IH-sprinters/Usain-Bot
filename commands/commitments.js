@@ -1,5 +1,5 @@
 const Sugar = require('sugar');
-const slack = require('../slack');
+const slack = require(__dirname + '/../slack');
 
 module.exports = (hook) => {
   const {respond, post, reply, error} = slack(hook);

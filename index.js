@@ -1,5 +1,5 @@
-const commit = require('./commands/commit');
-const commitments = require('./commands/commitments');
+const commit = require(__dirname + '/commands/commit');
+const commitments = require(__dirname + '/commands/commitments');
 
 module.exports = (hook) => {
   const {res, env, params} = hook;
