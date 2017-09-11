@@ -31,6 +31,8 @@ module.exports = (hook) => {
     const you = timeTravellers[Math.floor(Math.random() * timeTravellers.length)];
     return error(`This deadline would be in the past! Who do you think you are, ${you}?`);
   }
+
+  const testing = (command[2].indexOf('UBTEST') >= 0);
   
   hook.datastore.get('commitments', (err, _commitments) => {
     try {
@@ -47,7 +49,9 @@ module.exports = (hook) => {
       };
 
       const commitments = _commitments || [];
-      commitments.push(commitment);
+      if(!testing) {
+        commitments.push(commitment);
+      }
 
       hook.datastore.set('commitments', commitments, (err) => {
         try {
@@ -55,7 +59,10 @@ module.exports = (hook) => {
             return error('Failed to save your commitment to the datastore');
           }
           
-          post(`@${commitment.user_name} just committed to ${commitment.message} by ${Sugar.Date(deadline).medium()}`);
+          if(!testing) {
+            post(`@${commitment.user_name} just committed to ${commitment.message} by ${Sugar.Date(deadline).medium()}`);
+          }
+
           reply(`I've posted your commitment to ${command[2]} by ${command[1]} (${Sugar.Date(deadline).medium()}). ${"\n"}I'll post again on that date to see how it went!`, () => {
             hook.res.end();
           });

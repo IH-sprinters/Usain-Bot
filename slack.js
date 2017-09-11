@@ -8,14 +8,14 @@ module.exports = (hook) => {
     res.write(msg);
   };
   
-  const post = (msg) => request({
+  const post = (msg, cb) => request({
     method: 'POST',
     uri: env.POST_URL,
     json: true,
     body: {
       text: msg
     },
-  });
+  }, cb);
   
   const reply = (msg, cb) => request({
     method: 'POST',
@@ -25,7 +25,7 @@ module.exports = (hook) => {
   }, cb);
   
   const error = (msg) => {
-    reply(msg);
+    reply(msg, () => res.end());
   };
 
   return {respond, post, reply, error};
