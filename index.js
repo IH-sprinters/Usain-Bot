@@ -11,8 +11,10 @@ module.exports = (hook) => {
         return commit(hook);
       case '/commitments':
         return commitments(hook);
-        case '/checkup':
-          return checkup(hook);
+      case '/checkup':
+        return checkup(hook);
+      default:
+        res.end('invalid command');
     }
 
   } else {
