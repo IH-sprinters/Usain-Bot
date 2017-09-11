@@ -1,6 +1,6 @@
 const commit = require('./commands/commit');
 const commitments = require('./commands/commitments');
-const remind = require('./commands/remind');
+const checkup = require('./commands/checkup');
 
 module.exports = (hook) => {
   const {res, env, params} = hook;
@@ -11,8 +11,8 @@ module.exports = (hook) => {
         return commit(hook);
       case '/commitments':
         return commitments(hook);
-        case '/remind':
-          return remind(hook);
+        case '/checkup':
+          return checkup(hook);
     }
 
   } else {
