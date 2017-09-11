@@ -84,14 +84,14 @@ module.exports = (hook) => {
     res.write(msg);
   };
   
-  const post = (msg) => request({
+  const post = (msg, cb) => request({
     method: 'POST',
     uri: env.POST_URL,
     json: true,
     body: {
       text: msg
     },
-  });
+  }, cb);
   
   const reply = (msg, cb) => request({
     method: 'POST',
@@ -101,7 +101,7 @@ module.exports = (hook) => {
   }, cb);
   
   const error = (msg) => {
-    reply(msg);
+    reply(msg, () => res.end());
   };
 
   return {respond, post, reply, error};
@@ -114,6 +114,7 @@ module.exports = (hook) => {
 
 const commit = __webpack_require__(3);
 const commitments = __webpack_require__(5);
+const checkup = __webpack_require__(6);
 
 module.exports = (hook) => {
   const {res, env, params} = hook;
@@ -124,6 +125,10 @@ module.exports = (hook) => {
         return commit(hook);
       case '/commitments':
         return commitments(hook);
+      case '/checkup':
+        return checkup(hook);
+      default:
+        res.end('invalid command');
     }
 
   } else {
@@ -157,7 +162,7 @@ module.exports = (hook) => {
   }
   
   const deadline = Sugar.Date.create(command[1].replace(/^"|"$/g, ''));
-  if(!deadline) {
+  if(!(deadline && deadline.isValid())) {
     return error("Sorry, I couldn't parse your deadline - I use Sugar (https://sugarjs.com) to parse dates");
   }
 
@@ -171,6 +176,8 @@ module.exports = (hook) => {
     const you = timeTravellers[Math.floor(Math.random() * timeTravellers.length)];
     return error(`This deadline would be in the past! Who do you think you are, ${you}?`);
   }
+
+  const testing = (command[2].indexOf('UBTEST') >= 0);
   
   hook.datastore.get('commitments', (err, _commitments) => {
     try {
@@ -187,7 +194,9 @@ module.exports = (hook) => {
       };
 
       const commitments = _commitments || [];
-      commitments.push(commitment);
+      if(!testing) {
+        commitments.push(commitment);
+      }
 
       hook.datastore.set('commitments', commitments, (err) => {
         try {
@@ -195,7 +204,10 @@ module.exports = (hook) => {
             return error('Failed to save your commitment to the datastore');
           }
           
-          post(`@${commitment.user_name} just committed to ${commitment.message} by ${Sugar.Date(deadline).medium()}`);
+          if(!testing) {
+            post(`@${commitment.user_name} just committed to ${commitment.message} by ${Sugar.Date(deadline).medium()}`);
+          }
+
           reply(`I've posted your commitment to ${command[2]} by ${command[1]} (${Sugar.Date(deadline).medium()}). ${"\n"}I'll post again on that date to see how it went!`, () => {
             hook.res.end();
           });
@@ -213,6 +225,7 @@ module.exports = (hook) => {
     }
   });
 };
+
 
 /***/ }),
 /* 4 */
@@ -278,6 +291,42 @@ module.exports = (hook) => {
     reply(message, () => hook.res.end());
   });
 };
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const Sugar = __webpack_require__(0);
+const slack = __webpack_require__(1);
+
+module.exports = (hook) => {
+  const {respond, post, reply, error} = slack(hook);
+
+  hook.datastore.get('commitments', (err, commitments) => {
+    if(err) {
+      return error('Failed to retrieve the list of commitments');  
+    }
+
+    for(const commitment of commitments) {
+      const deadline = commitment.deadline && (new Date(commitment.deadline)).getTime();
+      const now = Date.now();
+      const created = Sugar.Date.create(commitment.created);
+      if(deadline && deadline <= now && (now - deadline < 86400000) && !('posted' in commitment)) {
+        post(`on ${created.medium()}, @${commitment.user_name} committed to ${commitment.message} by ${deadline.medium()} - how'd it go?`);
+        commitment.posted = true;
+      }
+    }
+
+    hook.datastore.set('commitments', commitments, (err) => {
+      if(err) {
+        return error('Failed to save your commitment to the datastore');
+      }
+
+      hook.res.end();
+    });
+  });
+};
+
 
 /***/ })
 /******/ ]);
