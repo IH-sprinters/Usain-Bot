@@ -17,7 +17,7 @@ module.exports = (hook) => {
   }
   
   const deadline = Sugar.Date.create(command[1].replace(/^"|"$/g, ''));
-  if(!deadline) {
+  if(!(deadline && deadline.isValid())) {
     return error("Sorry, I couldn't parse your deadline - I use Sugar (https://sugarjs.com) to parse dates");
   }
 
